@@ -1,0 +1,26 @@
+<!--
+Used to set proxy for running tests on GitLab runners.
+To run using the proxy, run "mvn -s settings.xml test".
+-->
+
+<settings>
+    <proxies>
+
+        <proxy>
+            <id>http-proxy</id>
+            <active>true</active>
+            <protocol>http</protocol>
+            <host>pzen.apps.dhs.gov</host>
+            <port>80</port>
+        </proxy>
+
+        <proxy>
+            <id>https-proxy</id>
+            <active>true</active>
+            <protocol>https</protocol>
+            <host>pzen.apps.dhs.gov</host>
+            <port>80</port>
+        </proxy>
+
+    </proxies>
+</settings>
