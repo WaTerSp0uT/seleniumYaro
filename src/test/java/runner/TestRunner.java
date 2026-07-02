@@ -8,7 +8,7 @@ import io.cucumber.junit.CucumberOptions.SnippetType;
 
 @RunWith(Cucumber.class)
 @CucumberOptions(
-        // tags = "@TestCase1 or @TestCase2",
+         tags = "@OHRM",
         // tags = "@TestCase5 or @TestCase6 or @TestCase11 or @Functional or @LoginLogout",
         // tags = "@ExternalUserOperations or @Login or @eConfigWorkflow or @ExternalUserOperations",
 
