@@ -12,13 +12,13 @@ import Factory.DriverFactory2;
 import utils.CommonUtils;
 import utils.ElementUtils;
 
-public class OrangeHRM {
+public class OrangeHRMLoginPage {
 
     private WebDriver driver;
     private ElementUtils elementUtils;
     private WebDriverWait wait;
 
-    public OrangeHRM() {
+    public OrangeHRMLoginPage() {
         this.driver = DriverFactory2.getDriver();
         PageFactory.initElements(driver, this);
         elementUtils = new ElementUtils(driver);
@@ -48,6 +48,9 @@ public class OrangeHRM {
 
     @FindBy(xpath = "//span[contains(@class,'oxd-userdropdown-tab')]")
     public WebElement userDropdown;
+
+    @FindBy(xpath = "//h6[normalize-space()='Dashboard']")
+    public WebElement dashboardHeader;
 
     public void enterUsername(String username) {
         elementUtils.typeTextIntoElement(
@@ -102,6 +105,12 @@ public class OrangeHRM {
     public boolean isUserDropdownDisplayed() {
         return elementUtils.displayStatusOfElement(
                 userDropdown,
+                CommonUtils.EXPLICIT_WAIT_BASIC_TIME);
+    }
+
+    public boolean isDashboardPageDisplayed() {
+        return elementUtils.displayStatusOfElement(
+                dashboardHeader,
                 CommonUtils.EXPLICIT_WAIT_BASIC_TIME);
     }
 }

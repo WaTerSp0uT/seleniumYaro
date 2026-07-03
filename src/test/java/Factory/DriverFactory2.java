@@ -81,13 +81,9 @@ public class DriverFactory2 {
 
             // or if above does not work use this AS WELL!
             // Proxy proxy = new Proxy();
-            // proxy.setHttpProxy("pzen.apps.dhs.gov:80");
-            // proxy.setSslProxy("pzen.apps.dhs.gov:80");
 
             if (execution.equals("remote")) {
 
-                System.setProperty("http.proxyHost", "pzen.apps.dhs.gov");
-                System.setProperty("http.proxyPort", "80");
 
                 // Isolate the Grid connection so it bypasses Zscaler completely
 

@@ -10,8 +10,20 @@
 # Maven
 target/
 
+# Test reports and screenshots
+test-output/
+test-output-screenshots/
+test-output/PdfReport/ExtentPdf.pdf
+test-output/SparkReport/Index.html
+
 # macOS
 .DS_Store
 
 # Logs
 *.log
+
+# Local secrets
+.env
+
+# Java build output
+*.class
