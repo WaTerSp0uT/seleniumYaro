@@ -8,18 +8,18 @@ import io.cucumber.junit.CucumberOptions.SnippetType;
 
 @RunWith(Cucumber.class)
 @CucumberOptions(
-        features = "@target/failed.txt",
+        features = "@target/playwright-failed.txt",
 
         glue = {
                 "stepDefinitions",
-                "Hooks"
+                "hooks"
         },
 
         plugin = {
                 "summary",
-                "rerun:target/failed.txt",
-                "html:target/builtInReport_rerun",
-                "json:target/Cucumber_rerun.json",
+                "rerun:target/playwright-failed.txt",
+                "html:target/playwright-builtInReport_rerun",
+                "json:target/PlaywrightCucumber_rerun.json",
                 "com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter:"
         },
 
@@ -27,6 +27,6 @@ import io.cucumber.junit.CucumberOptions.SnippetType;
         snippets = SnippetType.CAMELCASE,
         stepNotifications = true
 )
-public class FailedTestRunner {
+public class PlaywrightFailedTestRunner {
 
 }

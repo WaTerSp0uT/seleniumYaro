@@ -8,34 +8,27 @@ import io.cucumber.junit.CucumberOptions.SnippetType;
 
 @RunWith(Cucumber.class)
 @CucumberOptions(
-         tags = "@OHRM",
-        // tags = "@TestCase5 or @TestCase6 or @TestCase11 or @Functional or @LoginLogout",
-        // tags = "@ExternalUserOperations or @Login or @eConfigWorkflow or @ExternalUserOperations",
+        tags = "@OHRM_PLAYWRIGHT",
 
         features = "src/test/resources/features",
 
         glue = {
                 "stepDefinitions",
-                "Hooks"
+                "hooks"
         },
 
         plugin = {
                 "summary",
-                "rerun:target/failed.txt",
-                "html:target/builtInReport",
-                "json:target/Cucumber.json",
+                "rerun:target/playwright-failed.txt",
+                "html:target/playwright-builtInReport",
+                "json:target/PlaywrightCucumber.json",
                 "com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter:"
         },
 
         monochrome = true,
-        // dryRun = true,
         snippets = SnippetType.CAMELCASE,
         stepNotifications = true
-
-        // plugin = {
-        //     "com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter:"
-        // }
 )
-public class TestRunner {
+public class PlaywrightTestRunner {
 
 }

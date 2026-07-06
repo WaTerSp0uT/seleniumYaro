@@ -6,8 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import Factory.DriverFactory2;
-
 public class Library {
 
     private static Library library = null;
@@ -44,16 +42,6 @@ public class Library {
 
     public void setProperty(String key, String value) {
         properties.setProperty(key, value);
-    }
-
-    // Navigates to given URL using Driver
-    public void navigateTo(String url) {
-        DriverFactory2.getDriver().get(url);
-    }
-
-    // Returns current page title
-    public String getCurrentUrl(String url) {
-        return DriverFactory2.getDriver().getCurrentUrl();
     }
 
     public Properties configDataReadProperties(String appName) {

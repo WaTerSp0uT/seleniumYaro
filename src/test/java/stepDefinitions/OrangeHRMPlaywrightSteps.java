@@ -2,16 +2,17 @@ package stepDefinitions;
 
 import org.junit.Assert;
 
-import Pages.OHRM.OrangeHRMLoginPage;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import factory.PlaywrightFactory;
+import pages.ohrm.OrangeHRMLoginPage;
 import utils.SecretConfigReader;
 
-public class OrangeHRMSteps {
+public class OrangeHRMPlaywrightSteps {
 
-    private OrangeHRMLoginPage orangeHRM;
+    private OrangeHRMLoginPage orangeHRMLoginPage;
 
-    public OrangeHRMSteps() {
+    public OrangeHRMPlaywrightSteps() {
     }
 
     @When("I login to OrangeHRM with username {string} and password {string}")
@@ -19,8 +20,8 @@ public class OrangeHRMSteps {
             String username,
             String password) {
 
-        orangeHRM = new OrangeHRMLoginPage();
-        orangeHRM.login(username, password);
+        orangeHRMLoginPage = new OrangeHRMLoginPage(PlaywrightFactory.getPage());
+        orangeHRMLoginPage.login(username, password);
     }
 
     @When("I login to OrangeHRM with username key {string} and password key {string}")
@@ -28,15 +29,15 @@ public class OrangeHRMSteps {
             String usernameKey,
             String passwordKey) {
 
-        orangeHRM = new OrangeHRMLoginPage();
-        orangeHRM.login(
+        orangeHRMLoginPage = new OrangeHRMLoginPage(PlaywrightFactory.getPage());
+        orangeHRMLoginPage.login(
                 SecretConfigReader.getSecret(usernameKey),
                 SecretConfigReader.getSecret(passwordKey));
     }
 
     @Then("I should see OrangeHRM invalid credentials message")
     public void iShouldSeeOrangeHRMInvalidCredentialsMessage() {
-        String actualMessage = orangeHRM.getInvalidCredentialsMessageText();
+        String actualMessage = orangeHRMLoginPage.getInvalidCredentialsMessageText();
 
         Assert.assertTrue(
                 "Expected invalid credentials message, but found: " + actualMessage,
@@ -47,6 +48,6 @@ public class OrangeHRMSteps {
     public void iShouldSeeOrangeHRMDashboardPage() {
         Assert.assertTrue(
                 "Expected OrangeHRM dashboard page to be displayed.",
-                orangeHRM.isDashboardPageDisplayed());
+                orangeHRMLoginPage.isDashboardPageDisplayed());
     }
 }

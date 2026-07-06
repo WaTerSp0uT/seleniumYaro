@@ -1,15 +1,15 @@
-Feature: OrangeHRM Login
+Feature: OrangeHRM Login With Playwright
   As a user
-  I want to validate OrangeHRM login behavior
+  I want to validate OrangeHRM login behavior with Playwright
   So that I know users can and cannot access the application correctly
 
-  @OHRM @Negative
+  @OHRM_PLAYWRIGHT @Negative
   Scenario: Login with invalid credentials
     Given I navigate to "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login"
     When I login to OrangeHRM with username key "OHRM_INVALID_USERNAME" and password key "OHRM_INVALID_PASSWORD"
     Then I should see OrangeHRM invalid credentials message
 
-  @OHRM @Positive
+  @OHRM_PLAYWRIGHT @Positive
   Scenario: Login with valid credentials
     Given I navigate to "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login"
     When I login to OrangeHRM with username key "OHRM_VALID_USERNAME" and password key "OHRM_VALID_PASSWORD"

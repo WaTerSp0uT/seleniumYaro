@@ -17,7 +17,7 @@
 		<maven.compiler.source>17</maven.compiler.source>
 		<maven.compiler.target>17</maven.compiler.target>
 
-		<selenium.version>4.33.0</selenium.version>
+		<playwright.version>1.61.0</playwright.version>
 		<cucumber.version>7.10.1</cucumber.version>
 		<junit.version>4.13.2</junit.version>
 	</properties>
@@ -62,11 +62,11 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Selenium Java -->
+		<!-- Playwright Java -->
 		<dependency>
-			<groupId>org.seleniumhq.selenium</groupId>
-			<artifactId>selenium-java</artifactId>
-			<version>${selenium.version}</version>
+			<groupId>com.microsoft.playwright</groupId>
+			<artifactId>playwright</artifactId>
+			<version>${playwright.version}</version>
 		</dependency>
 
 		<!-- Cucumber Reporting -->
@@ -109,13 +109,6 @@
 			<groupId>org.hamcrest</groupId>
 			<artifactId>hamcrest</artifactId>
 			<version>3.0</version>
-		</dependency>
-
-		<!-- WebDriverManager -->
-		<dependency>
-			<groupId>io.github.bonigarcia</groupId>
-			<artifactId>webdrivermanager</artifactId>
-			<version>6.3.3</version>
 		</dependency>
 
 		<!-- Image Comparison -->
@@ -171,7 +164,7 @@
 					<parallel>methods</parallel>
 					<threadCount>5</threadCount>
 					<includes>
-						<include>**/TestRunner.java</include>
+						<include>**/PlaywrightTestRunner.java</include>
 					</includes>
 				</configuration>
 			</plugin>

@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.openqa.selenium.WebElement;
-
 public class Constants {
 
     public static final String ALERTMESSAGECOLOR = "rgb(223, 240, 216)";
