@@ -270,3 +270,71 @@ none
 ```
 
 Screenshots are attached to the Cucumber scenario and are available to compatible report outputs.
+
+
+
+
+
+Created a new Playwright Java automation framework branch for the project.
+Converted the framework from Selenium-based execution to Playwright-only execution.
+Removed Selenium/WebDriver/Grid-specific framework components from this branch.
+Set up Playwright with Java, Maven, Cucumber, JUnit 4, and Extent reporting.
+Created the Playwright framework structure with separate packages for:factory
+hooks
+pages
+runner
+stepDefinitions
+utils
+
+Implemented PlaywrightFactory to manage Playwright, Browser, BrowserContext, and Page lifecycle.
+Added Cucumber hooks for Playwright setup, screenshots, and cleanup after execution.
+Migrated OrangeHRM login scenarios into the Playwright framework.
+Added positive and negative OrangeHRM login test cases.
+Integrated SecretConfigReader so credentials can be passed through .env, JVM -D properties, or CI/CD environment variables.
+Updated Configs/config.properties for Playwright execution settings.
+Added explanatory comments to the config properties file for each key.
+Configured browser execution options such as browser type, headless mode, timeout, viewport, screenshots, downloads, and trace recording.
+Added Playwright Cucumber runner for normal test execution.
+Added failed-test rerun support using PlaywrightFailedTestRunner.
+Configured failed scenario output to target/playwright-failed.txt.
+Verified report generation options for:Cucumber HTML report
+Cucumber JSON report
+Extent Spark HTML report
+Extent PDF report
+failed-test rerun file
+
+Updated README with framework structure, execution commands, rerun instructions, report locations, and how to open reports visually.
+Updated .gitlab-ci.yml from the old Selenium/Grid setup to Playwright-based execution.
+Configured GitLab pipeline variables for Playwright browser type, headless execution, screenshot mode, Cucumber tags, and OrangeHRM credentials.
+Added artifact collection for reports, screenshots, Cucumber JSON, and failed-test files in GitLab.
+Reviewed the framework structure after refactoring and confirmed it compiles successfully.
+Currently reviewing the code and testing the initial Playwright test cases against the new framework setup.
+
+2:59 PM
+
+
+
+
+
+
+
+
+
+Add to chatAsk in side chat
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Ask for approval
+
+5.5Medium
