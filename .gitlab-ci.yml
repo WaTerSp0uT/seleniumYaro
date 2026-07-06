@@ -1,0 +1,74 @@
+# default:
+#   tags:
+#     - maestro-staging
+
+workflow:
+  name: "Build for $CI_PROJ_NAME"
+  rules:
+    # 1. Do NOT run if code is merged/pushed to the main branch
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"'
+      when: never
+
+    # 2. DO run if it's a scheduled task
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: always
+
+    # 3. DO run for manual triggers or other branches
+    - when: always
+
+stages:
+  - build
+  - test
+
+variables:
+  MAVEN_CLI_OPTS: "-s settings.xml --batch-mode"
+  PLAYWRIGHT_BROWSER_TYPE: "chromium"
+  PLAYWRIGHT_HEADLESS: "true"
+  SCREENSHOTS_OPTION: "failed"
+  CUCUMBER_TAGS: "@OHRM_PLAYWRIGHT"
+
+build:
+  stage: build
+  image: mcr.microsoft.com/playwright/java:v1.61.0-noble
+  before_script:
+    - export http_proxy=http://pzen.apps.dhs.gov:80
+    - export https_proxy=http://pzen.apps.dhs.gov:80
+
+  script:
+    - mvn $MAVEN_CLI_OPTS clean test-compile -DskipTests
+
+  artifacts:
+    when: always
+    expire_in: 1 day
+    paths:
+      - target/
+
+test:
+  stage: test
+  image: mcr.microsoft.com/playwright/java:v1.61.0-noble
+  before_script:
+    - export http_proxy=http://pzen.apps.dhs.gov:80
+    - export https_proxy=http://pzen.apps.dhs.gov:80
+
+  script:
+    - echo "Running Playwright tests locally inside the GitLab job environment"
+    - >
+      mvn $MAVEN_CLI_OPTS clean test
+      -DOHRM_VALID_USERNAME="$OHRM_VALID_USERNAME"
+      -DOHRM_VALID_PASSWORD="$OHRM_VALID_PASSWORD"
+      -DOHRM_INVALID_USERNAME="$OHRM_INVALID_USERNAME"
+      -DOHRM_INVALID_PASSWORD="$OHRM_INVALID_PASSWORD"
+      -DplaywrightBrowserType="$PLAYWRIGHT_BROWSER_TYPE"
+      -DplaywrightHeadless="$PLAYWRIGHT_HEADLESS"
+      -DplaywrightScreenshotOnStep="$SCREENSHOTS_OPTION"
+      -Dcucumber.filter.tags="$CUCUMBER_TAGS"
+
+  artifacts:
+    when: always
+    expire_in: 1 day
+    paths:
+      - test-output/
+      - test-output-screenshots/
+      - target/playwright-builtInReport/
+      - target/PlaywrightCucumber.json
+      - target/playwright-failed.txt
