@@ -134,7 +134,7 @@ Login with valid credentials
 
 ## How To Execute
 
-Run all Playwright scenarios:
+Run the default OrangeHRM login scenarios:
 
 ```bash
 mvn test
@@ -163,6 +163,28 @@ Run with Microsoft Edge:
 ```bash
 mvn test -DplaywrightBrowserType=edge
 ```
+
+## Manual Sign-In and Session Reuse Demo
+
+The opt-in `okta_` features use OrangeHRM as a stand-in for an app with manual PIV and Okta sign-in. This demo uses the OrangeHRM username and password shown on its login page.
+
+1. Run the capture feature, then sign in manually in the Chrome window it opens. The test waits up to five minutes for the dashboard and saves the session to `.playwright-auth/okta_orangehrm.json`.
+
+   ```bash
+   mvn test -Dtest=OktaAuthTestRunner -Dcucumber.filter.tags=@OKTA_AUTH_CAPTURE \
+     -DplaywrightBrowserType=chrome -DplaywrightHeadless=false \
+     -DplaywrightTrace=false -DplaywrightScreenshotOnStep=none
+   ```
+
+2. Run the reuse feature in a separate Maven invocation. It loads that file into a fresh browser context and verifies that the protected dashboard opens.
+
+   ```bash
+   mvn test -Dtest=OktaAuthTestRunner -Dcucumber.filter.tags=@OKTA_AUTH_REUSE \
+     -DplaywrightBrowserType=chrome -DplaywrightHeadless=true \
+     -DplaywrightTrace=false -DplaywrightScreenshotOnStep=none
+   ```
+
+The session file is Git-ignored and survives `mvn clean`. Treat it like a credential. Keep it local and rerun capture if the app redirects to login.
 
 ## Rerun Failed Tests
 

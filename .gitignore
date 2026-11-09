@@ -24,6 +24,7 @@ test-output/SparkReport/Index.html
 
 # Local secrets
 .env
+/.playwright-auth/
 
 # Java build output
 *.class

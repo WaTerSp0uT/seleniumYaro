@@ -1,5 +1,6 @@
 package factory;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -28,9 +29,17 @@ public class PlaywrightFactory {
 
     public static Page getPage() {
         if (pagePool.get() == null) {
-            createPage();
+            createPage(null);
         }
 
+        return pagePool.get();
+    }
+
+    public static Page openWithStorageState(Path storageStatePath) {
+        if (hasPage()) {
+            throw new IllegalStateException("Load storage state before opening a page in the scenario.");
+        }
+        createPage(storageStatePath);
         return pagePool.get();
     }
 
@@ -38,14 +47,14 @@ public class PlaywrightFactory {
         return pagePool.get() != null;
     }
 
-    private static void createPage() {
+    private static void createPage(Path storageStatePath) {
         Playwright playwright = Playwright.create();
         playwrightPool.set(playwright);
 
         Browser browser = createBrowser(playwright);
         browserPool.set(browser);
 
-        BrowserContext context = createContext(browser);
+        BrowserContext context = createContext(browser, storageStatePath);
         contextPool.set(context);
 
         if (getBooleanProperty("playwrightTrace", false)) {
@@ -88,7 +97,7 @@ public class PlaywrightFactory {
         }
     }
 
-    private static BrowserContext createContext(Browser browser) {
+    private static BrowserContext createContext(Browser browser, Path storageStatePath) {
         int viewportWidth = getIntegerProperty("playwrightViewportWidth", 1920);
         int viewportHeight = getIntegerProperty("playwrightViewportHeight", 1080);
         int timeout = getIntegerProperty("playwrightTimeout", 30000);
@@ -97,6 +106,10 @@ public class PlaywrightFactory {
         Browser.NewContextOptions contextOptions = new Browser.NewContextOptions()
                 .setAcceptDownloads(getBooleanProperty("playwrightAcceptDownloads", true))
                 .setIgnoreHTTPSErrors(true);
+
+        if (storageStatePath != null) {
+            contextOptions.setStorageStatePath(storageStatePath);
+        }
 
         if (!headless) {
             // null disables Playwright's fixed viewport emulation. The page viewport

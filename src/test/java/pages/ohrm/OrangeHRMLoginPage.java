@@ -85,6 +85,12 @@ public class OrangeHRMLoginPage {
         return isVisible(dashboardHeader);
     }
 
+    public void waitForDashboard(double timeoutMillis) {
+        dashboardHeader.waitFor(new Locator.WaitForOptions()
+                .setState(WaitForSelectorState.VISIBLE)
+                .setTimeout(timeoutMillis));
+    }
+
     private boolean isVisible(Locator locator) {
         try {
             locator.waitFor(new Locator.WaitForOptions()
