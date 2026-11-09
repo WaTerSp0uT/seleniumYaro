@@ -66,6 +66,11 @@ playwrightTrace=false
 playwrightScreenshotOnStep=failed
 ```
 
+In headed mode, the framework automatically disables Playwright's fixed
+viewport emulation so the page follows the native browser window. Chrome, Edge,
+and Chromium also launch maximized. Headless execution keeps the configured
+viewport dimensions for deterministic local and CI results.
+
 Supported `playwrightBrowserType` values:
 
 ```text

@@ -1,6 +1,7 @@
 package factory;
 
 import java.nio.file.Paths;
+import java.util.List;
 
 import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.BrowserContext;
@@ -60,10 +61,16 @@ public class PlaywrightFactory {
         String browserName = getProperty("playwrightBrowserType", "chrome")
                 .toLowerCase()
                 .trim();
+        boolean headless = getBooleanProperty("playwrightHeadless", false);
 
         BrowserType.LaunchOptions launchOptions = new BrowserType.LaunchOptions()
-                .setHeadless(getBooleanProperty("playwrightHeadless", false))
+                .setHeadless(headless)
                 .setSlowMo(getDoubleProperty("playwrightSlowMo", 0));
+
+        // Every visible Chromium-based browser starts maximized.
+        if (!headless && isChromiumBrowser(browserName)) {
+            launchOptions.setArgs(List.of("--start-maximized"));
+        }
 
         switch (browserName) {
             case "chrome":
@@ -85,17 +92,32 @@ public class PlaywrightFactory {
         int viewportWidth = getIntegerProperty("playwrightViewportWidth", 1920);
         int viewportHeight = getIntegerProperty("playwrightViewportHeight", 1080);
         int timeout = getIntegerProperty("playwrightTimeout", 30000);
+        boolean headless = getBooleanProperty("playwrightHeadless", false);
 
         Browser.NewContextOptions contextOptions = new Browser.NewContextOptions()
                 .setAcceptDownloads(getBooleanProperty("playwrightAcceptDownloads", true))
-                .setIgnoreHTTPSErrors(true)
-                .setViewportSize(viewportWidth, viewportHeight);
+                .setIgnoreHTTPSErrors(true);
+
+        if (!headless) {
+            // null disables Playwright's fixed viewport emulation. The page viewport
+            // then follows the real browser window size supplied by the host OS.
+            contextOptions.setViewportSize(null);
+        } else {
+            // Headless/CI runs keep a deterministic viewport.
+            contextOptions.setViewportSize(viewportWidth, viewportHeight);
+        }
 
         BrowserContext context = browser.newContext(contextOptions);
         context.setDefaultTimeout(timeout);
         context.setDefaultNavigationTimeout(timeout);
 
         return context;
+    }
+
+    private static boolean isChromiumBrowser(String browserName) {
+        return "chrome".equals(browserName)
+                || "edge".equals(browserName)
+                || "chromium".equals(browserName);
     }
 
     public static void closePlaywright() {
