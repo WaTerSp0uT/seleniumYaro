@@ -1,3 +1,4 @@
+from io import BytesIO
 from pathlib import Path
 
 from docx import Document
@@ -7,6 +8,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_BREAK, WD_LINE_SPACING
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Inches, Pt, RGBColor
+from PIL import Image, ImageDraw, ImageFont
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -307,6 +309,88 @@ def add_cover(doc):
     doc.add_page_break()
 
 
+def add_session_flowchart(doc, *, reuse):
+    canvas = Image.new("RGB", (1320, 360 if reuse else 140), "#FFFFFF")
+    draw = ImageDraw.Draw(canvas)
+    title_font = ImageFont.load_default(size=34)
+    detail_font = ImageFont.load_default(size=29)
+    columns = (10, 465, 920)
+    width = 390
+    height = 116
+
+    def card(column, y, title, detail, fill=LIGHT_BLUE, ink=BLUE):
+        x = columns[column]
+        draw.rounded_rectangle((x, y, x + width, y + height), radius=17,
+                               fill=f"#{fill}", outline=f"#{ink}", width=3)
+        draw.text((x + width / 2, y + 38), title, font=title_font,
+                  anchor="mm", fill=f"#{ink}", stroke_width=1)
+        draw.text((x + width / 2, y + 81), detail, font=detail_font,
+                  anchor="mm", fill=f"#{BLACK}")
+
+    def arrow(x, y, dx, dy):
+        ink = f"#{MID_GRAY}"
+        draw.line((x, y, x + dx * 42, y + dy * 42), fill=ink, width=5)
+        tip = (x + dx * 42, y + dy * 42)
+        base = (x + dx * 25, y + dy * 25)
+        draw.polygon([tip, (base[0] - dy * 10, base[1] + dx * 10),
+                      (base[0] + dy * 10, base[1] - dx * 10)], fill=ink)
+
+    if reuse:
+        draw.text((10, 4), "RUN 1  CAPTURE", font=detail_font, fill=f"#{BLUE}")
+        card(0, 45, "Manual sign-in", "Complete PIV and Okta")
+        card(1, 45, "Confirm sign-in", "Protected page is visible")
+        card(2, 45, "Save browser state", "Write session to local JSON")
+        arrow(411, 103, 1, 0)
+        arrow(866, 103, 1, 0)
+
+        draw.text((1310, 183), "RUN 2  REUSE", font=detail_font, anchor="rt", fill=f"#{TEAL}")
+        arrow(1115, 175, 0, 1)
+        card(2, 234, "Read saved JSON", "Pass file path to factory")
+        card(1, 234, "Start fresh context", "Playwright restores state")
+        card(0, 234, "Protected page opens", "If the session is still valid", LIGHT_TEAL, TEAL)
+        arrow(909, 292, -1, 0)
+        arrow(454, 292, -1, 0)
+        description = ("Run 1 uses manual PIV and Okta verification, checks for the protected page, "
+                       "and saves browser state to JSON. The same JSON flows into Run 2, where "
+                       "the factory creates a fresh context with that state and opens the protected page.")
+    else:
+        card(0, 12, "Fresh browser", "No saved session")
+        card(1, 12, "Protected page", "PIV and Okta required")
+        card(2, 12, "Test stops at sign-in", "Waiting for a tester", LIGHT_ORANGE, "9A3F19")
+        arrow(411, 70, 1, 0)
+        arrow(866, 70, 1, 0)
+        description = ("A fresh browser with no saved session requests the protected page, "
+                       "receives the PIV and Okta prompt, and waits for a tester to sign in.")
+
+    figure = BytesIO()
+    canvas.save(figure, format="PNG")
+    figure.seek(0)
+    paragraph = doc.add_paragraph()
+    paragraph.paragraph_format.space_after = Pt(8)
+    picture = paragraph.add_run().add_picture(figure, width=Inches(6.75))
+    picture._inline.docPr.set("descr", description)
+
+
+def add_manual_session_reuse(doc):
+    add_heading(doc, "10. Manual Sign In and Session Reuse", 1).paragraph_format.page_break_before = True
+    add_body(doc, "Use session reuse to test features behind sign-in in a protected application such as LSCMS. Start with a fresh context when testing the sign-in or reauthentication flow itself.")
+
+    add_heading(doc, "Why a fresh browser prompts for sign in", 2)
+    add_session_flowchart(doc, reuse=False)
+
+    add_heading(doc, "How capture and reuse work", 2)
+    add_session_flowchart(doc, reuse=True)
+    add_body(doc, "Run @OKTA_AUTH_CAPTURE in a visible browser. After sign-in, storageState() saves cookies and local storage to JSON. Run @OKTA_AUTH_REUSE separately. The step calls openWithStorageState(), and the factory sets the file path before creating the context.")
+
+    add_heading(doc, "Supervised execution on dedicated TDL machines", 2)
+    add_body(doc, "Run protected-application tests on a dedicated TDL machine under IV&V tester supervision. Keep the session JSON in the local directory covered by .gitignore. GitLab must not retain it in the repository, project variables, logs, caches, or artifacts.")
+
+    add_heading(doc, "GitLab execution with a temporary file", 2)
+    add_body(doc, "Configure the path. If CI/CD is required, update the reuse step to read PLAYWRIGHT_AUTH_STATE_PATH, with the existing local path as its default.", bold_lead="Configure the path.")
+    add_body(doc, "Supply the file and run. Use an approved handoff to write the JSON to a restricted temporary file for that job. Set PLAYWRIGHT_AUTH_STATE_PATH to the file path and run @OKTA_AUTH_REUSE.", bold_lead="Supply the file and run.")
+    add_body(doc, "Clean up. Delete the temporary file at job end, including on failure. If the runner is prompted for PIV or Okta again, use supervised execution on a TDL machine.", bold_lead="Clean up.")
+
+
 def build():
     doc = Document()
     configure_styles(doc)
@@ -321,7 +405,8 @@ def build():
     contents = [
         "1. Framework purpose and design", "2. Architecture and execution workflow", "3. Project structure and component responsibilities",
         "4. Local setup and execution", "5. GitLab CI/CD execution", "6. Adding a new test case", "7. Reports, screenshots, tracing, and reruns",
-        "8. Troubleshooting and team conventions", "9. New contributor checklist"
+        "8. Troubleshooting and team conventions", "9. New contributor checklist",
+        "10. Manual Sign In and Session Reuse"
     ]
     for item in contents:
         add_bullet(doc, item)
@@ -713,6 +798,8 @@ public void tearDown() {
     ]
     for c in checks:
         add_bullet(doc, "☐ " + c)
+
+    add_manual_session_reuse(doc)
 
     props = doc.core_properties
     props.title = "Playwright Java Cucumber Automation Framework — Onboarding Guide"

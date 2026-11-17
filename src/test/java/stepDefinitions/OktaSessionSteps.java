@@ -58,6 +58,7 @@ public class OktaSessionSteps {
 
     @Given("I open {string} using the saved OrangeHRM session")
     public void openWithSavedSession(String dashboardUrl) {
+        System.out.println("Hiiiii!!!");
         Assert.assertTrue("Saved OrangeHRM session is missing or unreadable. Run @OKTA_AUTH_CAPTURE first.",
                 Files.isRegularFile(STATE_FILE) && Files.isReadable(STATE_FILE));
         PlaywrightFactory.openWithStorageState(STATE_FILE).navigate(dashboardUrl);

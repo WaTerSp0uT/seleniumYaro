@@ -15,11 +15,13 @@ public class PlaywrightHooks {
 
     @Before
     public void setup() {
+        System.out.println("Hiiiii!!!");
         screenshotMode = getScreenshotMode();
     }
 
     @Before
     public void setupThread() {
+        System.out.println("Hiiiii!!!");
         long threadId = Thread.currentThread().getId();
         System.out.println("Running Playwright Scenario on Thread ID: " + threadId);
     }
